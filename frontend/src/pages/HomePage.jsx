@@ -3,6 +3,7 @@ import { fetchPosts } from "../services/api";
 import PostCard from "../components/PostCard";
 import usePageTitle from "../hooks/usePageTitle";
 
+
 const HomePage = () => {
     usePageTitle("Home");
     const [posts, setPosts] = useState([]);
@@ -31,7 +32,7 @@ const HomePage = () => {
 
     if (loading) {
         return (
-            <div className="container py-5">
+            <div className="container py-5 relative z-10" style={{ position: "relative", zIndex: 10 }}>
                 <header className="mb-5">
                     <h1 className="display-5 mb-2">Editor's Picks</h1>
                     <p className="text-secondary lead">Explore the latest thoughts and stories from our community.</p>
@@ -74,7 +75,7 @@ const HomePage = () => {
     }
 
     return (
-        <div className="container py-5">
+        <div className="container py-5 relative z-10" style={{ position: "relative", zIndex: 10 }}>
             <header className="mb-5">
                 <h1 className="display-5 mb-2">Editor's Picks</h1>
                 <p className="text-secondary lead">Explore the latest thoughts and stories from our community.</p>

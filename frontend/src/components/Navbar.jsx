@@ -48,7 +48,7 @@ const Navbar = () => {
                         )}
                     </ul>
                     <div className="d-flex align-items-center ms-auto">
-                        {user ? (
+                        {user && (
                             <div className="dropdown">
                                 <button
                                     className="btn btn-link p-0 border-0 text-decoration-none dropdown-toggle d-flex align-items-center"
@@ -80,8 +80,6 @@ const Navbar = () => {
                                     </li>
                                 </ul>
                             </div>
-                        ) : (
-                            <Link to="/login" className="btn btn-primary rounded-pill px-4 fw-bold">Login</Link>
                         )}
                     </div>
                 </div>

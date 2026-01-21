@@ -7,7 +7,14 @@ import usePageTitle from "../hooks/usePageTitle";
 const ProfilePage = () => {
     usePageTitle("Profile");
     const { user, updateAuth } = useAuth();
+    const [isEditMode, setIsEditMode] = useState(false);
     const [formData, setFormData] = useState({
+        name: user?.name || "",
+        username: user?.username || "",
+        email: user?.email || "",
+        password: ""
+    });
+    const [originalData, setOriginalData] = useState({
         name: user?.name || "",
         username: user?.username || "",
         email: user?.email || "",
@@ -16,12 +23,14 @@ const ProfilePage = () => {
 
     React.useEffect(() => {
         if (user) {
-            setFormData(prev => ({
-                ...prev,
+            const userData = {
                 name: user.name || "",
                 username: user.username || "",
-                email: user.email || ""
-            }));
+                email: user.email || "",
+                password: ""
+            };
+            setFormData(userData);
+            setOriginalData(userData);
         }
     }, [user]);
     const [loading, setLoading] = useState(false);
@@ -29,6 +38,17 @@ const ProfilePage = () => {
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleEditClick = () => {
+        setIsEditMode(true);
+        setMessage({ type: "", text: "" });
+    };
+
+    const handleCancelClick = () => {
+        setFormData(originalData);
+        setIsEditMode(false);
+        setMessage({ type: "", text: "" });
     };
 
     const getInitials = (name) => {
@@ -46,7 +66,9 @@ const ProfilePage = () => {
             if (data.token) {
                 updateAuth(data.token);
             }
+            setOriginalData({ ...formData, password: "" });
             setFormData(prev => ({ ...prev, password: "" }));
+            setIsEditMode(false);
         } catch (err) {
             setMessage({ type: "danger", text: err.response?.data?.message || "Failed to update profile." });
         } finally {
@@ -55,7 +77,7 @@ const ProfilePage = () => {
     };
 
     return (
-        <div className="container py-5">
+        <div className="container py-5 relative z-10" style={{ position: "relative", zIndex: 10 }}>
             <div className="row justify-content-center">
                 <div className="col-md-6 col-lg-5">
                     <BackButton />
@@ -75,63 +97,99 @@ const ProfilePage = () => {
                             </div>
                         )}
 
-                        <form onSubmit={handleSubmit}>
-                            <div className="mb-3">
-                                <label className="form-label fw-semibold small">Full Name</label>
-                                <input
-                                    type="text"
-                                    name="name"
-                                    className="form-control form-control-lg border-2"
-                                    value={formData.name}
-                                    onChange={handleChange}
-                                    required
-                                />
+                        {!isEditMode ? (
+                            <div>
+                                <div className="mb-4">
+                                    <div className="mb-3">
+                                        <label className="form-label fw-semibold small text-muted">Full Name</label>
+                                        <p className="mb-0 fs-6">{formData.name}</p>
+                                    </div>
+                                    <div className="mb-3">
+                                        <label className="form-label fw-semibold small text-muted">Username</label>
+                                        <p className="mb-0 fs-6">@{formData.username}</p>
+                                    </div>
+                                    <div className="mb-3">
+                                        <label className="form-label fw-semibold small text-muted">Email Address</label>
+                                        <p className="mb-0 fs-6">{formData.email}</p>
+                                    </div>
+                                </div>
+                                <button
+                                    type="button"
+                                    className="btn btn-primary w-100 py-3 rounded-pill fw-bold"
+                                    onClick={handleEditClick}
+                                >
+                                    Update Profile
+                                </button>
                             </div>
-                            <div className="mb-3">
-                                <label className="form-label fw-semibold small">Username</label>
-                                <div className="input-group">
-                                    <span className="input-group-text border-2 bg-light">@</span>
+                        ) : (
+                            <form onSubmit={handleSubmit}>
+                                <div className="mb-3">
+                                    <label className="form-label fw-semibold small">Full Name</label>
                                     <input
                                         type="text"
-                                        name="username"
+                                        name="name"
                                         className="form-control form-control-lg border-2"
-                                        value={formData.username}
+                                        value={formData.name}
                                         onChange={handleChange}
                                         required
                                     />
                                 </div>
-                            </div>
-                            <div className="mb-3">
-                                <label className="form-label fw-semibold small">Email Address</label>
-                                <input
-                                    type="email"
-                                    name="email"
-                                    className="form-control form-control-lg border-2"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label className="form-label fw-semibold small">Change Password</label>
-                                <input
-                                    type="password"
-                                    name="password"
-                                    className="form-control form-control-lg border-2"
-                                    placeholder="Leave blank to keep current"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <button
-                                type="submit"
-                                className="btn btn-primary w-100 py-3 rounded-pill fw-bold"
-                                disabled={loading}
-                            >
-                                {loading && <span className="spinner-border spinner-border-sm me-2"></span>}
-                                Update Account
-                            </button>
-                        </form>
+                                <div className="mb-3">
+                                    <label className="form-label fw-semibold small">Username</label>
+                                    <div className="input-group">
+                                        <span className="input-group-text border-2 bg-light">@</span>
+                                        <input
+                                            type="text"
+                                            name="username"
+                                            className="form-control form-control-lg border-2"
+                                            value={formData.username}
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label fw-semibold small">Email Address</label>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        className="form-control form-control-lg border-2"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+                                <div className="mb-4">
+                                    <label className="form-label fw-semibold small">Change Password</label>
+                                    <input
+                                        type="password"
+                                        name="password"
+                                        className="form-control form-control-lg border-2"
+                                        placeholder="Leave blank to keep current"
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                                <div className="d-grid gap-2">
+                                    <button
+                                        type="submit"
+                                        className="btn btn-primary py-3 rounded-pill fw-bold"
+                                        disabled={loading}
+                                    >
+                                        {loading && <span className="spinner-border spinner-border-sm me-2"></span>}
+                                        Save Changes
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="btn btn-outline-secondary py-3 rounded-pill fw-bold"
+                                        onClick={handleCancelClick}
+                                        disabled={loading}
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        )}
                     </div>
                 </div>
             </div>

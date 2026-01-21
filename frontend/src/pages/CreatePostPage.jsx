@@ -33,7 +33,7 @@ const CreatePostPage = () => {
     };
 
     return (
-        <div className="container py-5">
+        <div className="container py-5 relative z-10" style={{ position: "relative", zIndex: 10 }}>
             <div className="row justify-content-center">
                 <div className="col-md-8">
                     <BackButton />

@@ -30,52 +30,82 @@ const RegisterPage = () => {
     };
 
     return (
-        <div className="container py-large">
+        <div className="container py-large relative z-10" style={{ position: "relative", zIndex: 10 }}>
             <div className="row justify-content-center">
                 <div className="col-md-5">
                     <div className="card p-4">
-                        <h2 className="text-center mb-4">Join BlogApp</h2>
-                        {error && <div className="alert alert-danger py-2">{error}</div>}
+                        <h2 className="text-center mb-4">
+                            <i className="bi bi-person-plus me-2"></i>Register
+                        </h2>
+
+                        {error && (
+                            <div className="alert alert-danger py-2">
+                                <i className="bi bi-exclamation-triangle me-2"></i>
+                                {error}
+                            </div>
+                        )}
+
                         <form onSubmit={handleSubmit}>
                             <div className="mb-3">
                                 <label className="form-label">Full Name</label>
-                                <input
-                                    type="text"
-                                    name="name"
-                                    className="form-control"
-                                    placeholder="John Doe"
-                                    required
-                                    autoComplete="off"
-                                    onChange={handleChange}
-                                />
+                                <div className="input-group">
+                                    <span className="input-group-text">
+                                        <i className="bi bi-person"></i>
+                                    </span>
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        className="form-control"
+                                        placeholder="John Doe"
+                                        required
+                                        autoComplete="off"
+                                        onChange={handleChange}
+                                    />
+                                </div>
                             </div>
+
                             <div className="mb-3">
                                 <label className="form-label">Email Address</label>
-                                <input
-                                    type="email"
-                                    name="email"
-                                    className="form-control"
-                                    placeholder="name@example.com"
-                                    required
-                                    autoComplete="off"
-                                    onChange={handleChange}
-                                />
+                                <div className="input-group">
+                                    <span className="input-group-text">
+                                        <i className="bi bi-envelope"></i>
+                                    </span>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        className="form-control"
+                                        placeholder="name@example.com"
+                                        required
+                                        autoComplete="off"
+                                        onChange={handleChange}
+                                    />
+                                </div>
                             </div>
+
                             <div className="mb-3">
                                 <label className="form-label">Username</label>
-                                <input
-                                    type="text"
-                                    name="username"
-                                    className="form-control"
-                                    placeholder="johndoe123"
-                                    required
-                                    autoComplete="off"
-                                    onChange={handleChange}
-                                />
+                                <div className="input-group">
+                                    <span className="input-group-text">
+                                        <i className="bi bi-at"></i>
+                                    </span>
+                                    <input
+                                        type="text"
+                                        name="username"
+                                        className="form-control"
+                                        placeholder="johndoe123"
+                                        required
+                                        autoComplete="off"
+                                        onChange={handleChange}
+                                    />
+                                </div>
                             </div>
+
                             <div className="mb-4">
                                 <label className="form-label">Password</label>
                                 <div className="input-group">
+                                    <span className="input-group-text">
+                                        <i className="bi bi-lock"></i>
+                                    </span>
                                     <input
                                         type={showPassword ? "text" : "password"}
                                         name="password"
@@ -94,19 +124,26 @@ const RegisterPage = () => {
                                     </button>
                                 </div>
                             </div>
+
                             <button
                                 type="submit"
                                 className="btn btn-primary w-100 py-2 mb-3"
                                 disabled={loading}
                             >
-                                {loading ? (
+                                {loading && (
                                     <span className="spinner-border spinner-border-sm me-2"></span>
-                                ) : null}
+                                )}
+                                <i className="bi bi-person-check me-2"></i>
                                 Register
                             </button>
                         </form>
+
                         <p className="text-center mb-0 mt-3">
-                            Already have an account? <Link to="/login" className="text-decoration-none">Login here</Link>
+                            <i className="bi bi-box-arrow-in-right me-1"></i>
+                            Already have an account?
+                            <Link to="/login" className="ms-1 text-decoration-none">
+                                Login here
+                            </Link>
                         </p>
                     </div>
                 </div>

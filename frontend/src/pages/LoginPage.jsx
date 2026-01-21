@@ -32,28 +32,46 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="container py-large">
+        <div className="container py-large relative z-10" style={{ position: "relative", zIndex: 10 }}>
             <div className="row justify-content-center">
                 <div className="col-md-5">
                     <div className="card p-4">
-                        <h2 className="text-center mb-4">Welcome Back</h2>
-                        {error && <div className="alert alert-danger py-2">{error}</div>}
+                        <h2 className="text-center mb-4">
+                            <i className="bi bi-box-arrow-in-right me-2"></i>Login
+                        </h2>
+
+                        {error && (
+                            <div className="alert alert-danger py-2">
+                                <i className="bi bi-exclamation-triangle me-2"></i>
+                                {error}
+                            </div>
+                        )}
+
                         <form onSubmit={handleSubmit}>
                             <div className="mb-3">
                                 <label className="form-label">Email or Username</label>
-                                <input
-                                    type="text"
-                                    name="identifier"
-                                    className="form-control"
-                                    placeholder="Enter email or username"
-                                    required
-                                    autoComplete="off"
-                                    onChange={handleChange}
-                                />
+                                <div className="input-group">
+                                    <span className="input-group-text">
+                                        <i className="bi bi-person"></i>
+                                    </span>
+                                    <input
+                                        type="text"
+                                        name="identifier"
+                                        className="form-control"
+                                        placeholder="Enter email or username"
+                                        required
+                                        autoComplete="off"
+                                        onChange={handleChange}
+                                    />
+                                </div>
                             </div>
+
                             <div className="mb-4">
                                 <label className="form-label">Password</label>
                                 <div className="input-group">
+                                    <span className="input-group-text">
+                                        <i className="bi bi-lock"></i>
+                                    </span>
                                     <input
                                         type={showPassword ? "text" : "password"}
                                         name="password"
@@ -72,19 +90,26 @@ const LoginPage = () => {
                                     </button>
                                 </div>
                             </div>
+
                             <button
                                 type="submit"
                                 className="btn btn-primary w-100 py-2 mb-3"
                                 disabled={loading}
                             >
-                                {loading ? (
+                                {loading && (
                                     <span className="spinner-border spinner-border-sm me-2"></span>
-                                ) : null}
+                                )}
+                                <i className="bi bi-box-arrow-in-right me-2"></i>
                                 Login
                             </button>
                         </form>
+
                         <p className="text-center mb-0 mt-3">
-                            Don't have an account? <Link to="/register" className="text-decoration-none">Register here</Link>
+                            <i className="bi bi-person-plus me-1"></i>
+                            Don't have an account?
+                            <Link to="/register" className="ms-1 text-decoration-none">
+                                Register here
+                            </Link>
                         </p>
                     </div>
                 </div>

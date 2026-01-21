@@ -11,6 +11,7 @@ import CreatePostPage from "./pages/CreatePostPage";
 import MyPostsPage from "./pages/MyPostsPage";
 import ProfilePage from "./pages/ProfilePage";
 import UpdatePostPage from "./pages/UpdatePostPage";
+import BackgroundLayout from "./components/BackgroundLayout";
 
 import "./App.css";
 
@@ -20,59 +21,62 @@ function App() {
       <AuthProvider>
         <Navbar />
         <main>
-          <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
 
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <HomePage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/create"
-              element={
-                <ProtectedRoute>
-                  <CreatePostPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/my-posts"
-              element={
-                <ProtectedRoute>
-                  <MyPostsPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <ProfilePage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/post/:id"
-              element={
-                <ProtectedRoute>
-                  <PostDetailsPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/edit/:id"
-              element={
-                <ProtectedRoute>
-                  <UpdatePostPage />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
+          <BackgroundLayout>
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <HomePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/create"
+                element={
+                  <ProtectedRoute>
+                    <CreatePostPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/my-posts"
+                element={
+                  <ProtectedRoute>
+                    <MyPostsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <ProfilePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/post/:id"
+                element={
+                  <ProtectedRoute>
+                    <PostDetailsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/edit/:id"
+                element={
+                  <ProtectedRoute>
+                    <UpdatePostPage />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </BackgroundLayout>
         </main>
       </AuthProvider>
     </Router>

@@ -13,6 +13,7 @@ const MyPostsPage = () => {
     const navigate = useNavigate();
 
     const loadMyPosts = async () => {
+        if (!user) return;
         try {
             const { data } = await fetchPosts();
             const myPosts = data.filter(post => post.email === user.email || post.authorId === user.userId);
@@ -26,7 +27,7 @@ const MyPostsPage = () => {
 
     useEffect(() => {
         loadMyPosts();
-    }, []);
+    }, [user]);
 
     const handleDelete = async (id) => {
         if (!window.confirm("Are you sure you want to delete this post?")) return;
@@ -40,7 +41,7 @@ const MyPostsPage = () => {
 
     if (loading) {
         return (
-            <div className="container py-large text-center">
+            <div className="container py-large text-center relative z-10" style={{ position: "relative", zIndex: 10 }}>
                 <div className="spinner-border text-primary" role="status">
                     <span className="visually-hidden">Loading...</span>
                 </div>
@@ -49,7 +50,7 @@ const MyPostsPage = () => {
     }
 
     return (
-        <div className="container py-5">
+        <div className="container py-5 relative z-10" style={{ position: "relative", zIndex: 10 }}>
             <BackButton />
             <div className="d-flex justify-content-between align-items-center mb-5">
                 <div>

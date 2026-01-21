@@ -4,12 +4,16 @@ import { fetchPostById, reactPost, addComment, deleteComment, deletePost } from 
 import { useAuth } from "../context/AuthContext";
 import BackButton from "../components/BackButton";
 import LikesDropdown from "../components/LikesDropdown";
+import usePageTitle from "../hooks/usePageTitle";
 
 const PostDetailsPage = () => {
     const { id } = useParams();
     const { user } = useAuth();
     const navigate = useNavigate();
     const [post, setPost] = useState(null);
+
+    usePageTitle(post?.title || "Post Details");
+
     const [loading, setLoading] = useState(true);
     const [commentText, setCommentText] = useState("");
     const [submittingComment, setSubmittingComment] = useState(false);
@@ -120,7 +124,7 @@ const PostDetailsPage = () => {
 
     if (loading) {
         return (
-            <div className="container py-5">
+            <div className="container py-5 relative z-10" style={{ position: "relative", zIndex: 10 }}>
                 <div className="row justify-content-center">
                     <div className="col-lg-8">
                         <BackButton />
@@ -180,17 +184,17 @@ const PostDetailsPage = () => {
 
     if (!post) {
         return (
-            <div className="container py-large text-center">
+            <div className="container py-large text-center relative z-10" style={{ position: "relative", zIndex: 10 }}>
                 <h3>Post not found</h3>
                 <button className="btn btn-primary mt-3" onClick={() => navigate("/")}>Back to Home</button>
             </div>
-        )
+        );
     }
 
     const isAuthor = user && (user.userId === post.authorId || user.email === post.email);
 
     return (
-        <div className="container py-5">
+        <div className="container py-5 relative z-10" style={{ position: "relative", zIndex: 10 }}>
             <div className="row justify-content-center">
                 <div className="col-lg-8">
                     <BackButton />
