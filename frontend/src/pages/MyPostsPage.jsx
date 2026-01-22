@@ -79,18 +79,29 @@ const MyPostsPage = () => {
                                         <h4 className="mb-2">
                                             <Link to={`/post/${post._id}`} className="text-decoration-none text-dark">{post.title}</Link>
                                         </h4>
-                                        <p className="text-secondary small mb-2" style={{
-                                            display: "-webkit-box",
-                                            WebkitLineClamp: 2,
-                                            WebkitBoxOrient: "vertical",
-                                            overflow: "hidden"
+                                        {post.uploadImage && (
+                                            <div className="mb-3">
+                                                <img 
+                                                    src={`http://localhost:5000/${post.uploadImage}`} 
+                                                    alt={post.title}
+                                                    className="img-fluid rounded"
+                                                    style={{ maxWidth: "100%", height: "250px", width:"350px", objectFit: "cover", borderRadius: "2px", boxShadow: "0 2px 6px rgba(0,0,0,0.1)" }}
+                                                />
+                                            </div>
+                                        )}
+                                        <p className="text-secondary " style={{
+                                            // display: "-webkit-box",
+                                            // WebkitLineClamp: 2,
+                                            // WebkitBoxOrient: "vertical",
+                                            // overflow: "hidden"
                                         }}>
                                             {post.content}
                                         </p>
+                                        
                                         <div className="d-flex gap-3 text-muted small">
                                             <span><i className="bi bi-calendar3 me-1"></i> {new Date(post.createdAt).toLocaleDateString()}</span>
-                                            <span><i className="bi bi-hand-thumbs-up me-1"></i> {post.likes.length} Likes</span>
-                                            <span><i className="bi bi-chat-left-text me-1"></i> {post.comments.length} Comments</span>
+                                            <span><i className="bi bi-hand-thumbs-up me-1"></i> {post.totalLikeCount || 0} Likes</span>
+                                            <span><i className="bi bi-chat-left-text me-1"></i> {post.commentsCount || 0} Comments</span>
                                         </div>
                                     </div>
                                     <div className="col-md-3 text-md-end mt-3 mt-md-0">

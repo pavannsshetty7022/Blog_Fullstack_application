@@ -164,7 +164,7 @@ const reactPost = async (req, res) => {
     let userReaction = reaction;
 
     if (existingReaction) {
-      if (existingReaction.type === reaction) {
+      if (existingReaction.type === reaction || reaction === null) {
         await existingReaction.deleteOne();
         userReaction = null;
       } else {
