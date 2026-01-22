@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 
-// Models
+
 import Like from "../models/Like.js";
 import Comment from "../models/Comment.js";
 import Post from "../models/Post.js";
