@@ -28,7 +28,6 @@ const migrate = async () => {
         console.log(`Found ${rawPosts.length} posts to process`);
 
         for (const post of rawPosts) {
-            // Process Likes
             if (Array.isArray(post.likes)) {
                 for (const userId of post.likes) {
                     if (!userId) continue;
@@ -40,7 +39,6 @@ const migrate = async () => {
                 }
             }
 
-            // Process Dislikes
             if (Array.isArray(post.dislikes)) {
                 for (const userId of post.dislikes) {
                     if (!userId) continue;
@@ -52,13 +50,12 @@ const migrate = async () => {
                 }
             }
 
-            // Process Comments
             if (Array.isArray(post.comments)) {
                 for (const comment of post.comments) {
-                    if (!comment.user) continue; // Assuming old schema had 'user' or 'userId'
+                    if (!comment.user) continue;
                     newComments.push({
                         postId: post._id,
-                        userId: comment.user || comment.userId, // Handle potential naming var
+                        userId: comment.user || comment.userId,
                         text: comment.text || comment.content,
                         createdAt: comment.createdAt || new Date(),
                     });
@@ -78,7 +75,6 @@ const migrate = async () => {
             console.log(`Migrated ${newComments.length} comments`);
         }
 
-        // Cleanup old fields
         if (postsToClean.length > 0) {
             await postsCollection.updateMany(
                 { _id: { $in: postsToClean } },
