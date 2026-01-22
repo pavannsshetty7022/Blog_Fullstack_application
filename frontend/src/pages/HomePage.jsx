@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { fetchPosts } from "../services/api";
 import PostCard from "../components/PostCard";
-import usePageTitle from "../hooks/usePageTitle";
+import usePageTitle from "../hooks/usePageTitle.jsx";
 
 
 const HomePage = () => {

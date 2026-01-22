@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { register as registerApi } from "../services/api";
-import usePageTitle from "../hooks/usePageTitle";
+import usePageTitle from "../hooks/usePageTitle.jsx";
 
 const RegisterPage = () => {
   usePageTitle("Register");
@@ -106,7 +106,7 @@ const RegisterPage = () => {
                     type={showPassword ? "text" : "password"}
                     name="password"
                     className="form-control"
-                    placeholder="Choose a strong password"
+                    placeholder="Choose a password"
                     required
                     onChange={handleChange}
                   />

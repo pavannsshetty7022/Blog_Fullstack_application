@@ -11,14 +11,16 @@ import {
 } from "../controllers/postController.js";
 import auth from "../middleware/authMiddleware.js";
 
+import upload from "../middleware/uploadMiddleware.js";
+
 const router = express.Router();
 
-router.post("/", auth, createPost);
+router.post("/", auth, upload.single("image"), createPost);
 router.get("/", getAllPosts);
 
 router.post("/:id/react", auth, reactPost);
 
-router.put("/:id", auth, updatePost);
+router.put("/:id", auth, upload.single("image"), updatePost);
 router.delete("/:id", auth, deletePost);
 
 router.post("/:id/comments", auth, addComment);

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { updateProfile } from "../services/api";
 import BackButton from "../components/BackButton";
-import usePageTitle from "../hooks/usePageTitle";
+import usePageTitle from "../hooks/usePageTitle.jsx";
 
 const ProfilePage = () => {
     usePageTitle("Profile");

@@ -1,12 +1,60 @@
 import Post from "../models/Post.js";
+import Like from "../models/Like.js";
+import Comment from "../models/Comment.js";
+import jwt from "jsonwebtoken";
+
+const getUserId = (req) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) return null;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    return decoded.userId;
+  } catch (error) {
+    return null;
+  }
+};
+
+const getPostStats = async (postId, userId) => {
+  const [likesCount, dislikesCount, commentsCount, likedUsers] = await Promise.all([
+    Like.countDocuments({ postId, type: "like" }),
+    Like.countDocuments({ postId, type: "dislike" }),
+    Comment.countDocuments({ postId }),
+    Like.find({ postId, type: "like" }).populate("userId", "name username avatar profileImage").limit(10),
+  ]);
+
+  let userReaction = null;
+  if (userId) {
+    const reaction = await Like.findOne({ postId, userId });
+    if (reaction) userReaction = reaction.type;
+  }
+
+  return {
+    totalLikeCount: likesCount,
+    dislikeCount: dislikesCount,
+    commentsCount,
+    likedByCurrentUser: userReaction === 'like',
+    otherLikeCount: Math.max(0, likesCount - (userReaction === 'like' ? 1 : 0)),
+    userReaction,
+    likedUsers: likedUsers.map(l => ({
+      userId: l.userId._id,
+      name: l.userId.name
+    }))
+  };
+};
 
 const createPost = async (req, res) => {
   try {
     const { title, content } = req.body;
+    let uploadImage = req.body.uploadImage;
+
+    if (req.file) {
+      uploadImage = req.file.path;
+    }
 
     const post = await Post.create({
       title,
       content,
+      uploadImage,
       author: req.user.userId,
     });
 
@@ -19,10 +67,9 @@ const createPost = async (req, res) => {
       _id: populatedPost._id,
       title: populatedPost.title,
       content: populatedPost.content,
-      author: populatedPost.author.name,
-      email: populatedPost.author.email,
-      likes: populatedPost.likes,
-      dislikes: populatedPost.dislikes,
+      uploadImage: populatedPost.uploadImage,
+      author: populatedPost.author?.name,
+      email: populatedPost.author?.email,
       createdAt: populatedPost.createdAt,
       updatedAt: populatedPost.updatedAt,
     });
@@ -35,41 +82,73 @@ const getAllPosts = async (req, res) => {
   try {
     const posts = await Post.find()
       .populate("author", "name username email")
-      .populate("likes", "name username")
-      .populate("dislikes", "name username")
-      .populate("comments.user", "name username email")
       .sort({ createdAt: -1 });
 
-    const formattedPosts = posts.map((post) => ({
+    const result = await Promise.all(
+      posts.map(async (post) => {
+        const userId = getUserId(req);
+        const stats = await getPostStats(post._id, userId);
+
+        return {
+          _id: post._id,
+          title: post.title,
+          content: post.content,
+          uploadImage: post.uploadImage,
+          author: post.author?.name || "Unknown",
+          authorUsername: post.author?.username || "unknown",
+          email: post.author?.email || "",
+          ...stats,
+          createdAt: post.createdAt,
+          updatedAt: post.updatedAt,
+        };
+      })
+    );
+
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getPostById = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id).populate(
+      "author",
+      "name username email"
+    );
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    const userId = getUserId(req);
+    const stats = await getPostStats(post._id, userId);
+
+    const comments = await Comment.find({ postId: post._id })
+      .populate("userId", "name")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
       _id: post._id,
       title: post.title,
       content: post.content,
-      author: post.author.name,
-      authorUsername: post.author.username,
-      email: post.author.email,
-      likes: post.likes.map((u) => ({
-        _id: u._id,
-        name: u.name,
-        username: u.username,
-      })),
-      dislikes: post.dislikes.map((u) => ({
-        _id: u._id,
-        name: u.name,
-        username: u.username,
-      })),
-      comments: post.comments.map((c) => ({
-        _id: c._id,
+      uploadImage: post.uploadImage,
+      author: post.author?.name || "Unknown",
+      authorUsername: post.author?.username || "unknown",
+      email: post.author?.email || "",
+      ...stats,
+      comments: comments.map(c => ({
+        commentId: c._id,
         text: c.text,
-        user: c.user?.name,
-        username: c.user?.username,
-        email: c.user?.email,
         createdAt: c.createdAt,
+        author: {
+          id: c.userId._id,
+          name: c.userId.name
+        }
       })),
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
-    }));
-
-    res.status(200).json(formattedPosts);
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -77,35 +156,31 @@ const getAllPosts = async (req, res) => {
 
 const reactPost = async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id);
-    if (!post) {
-      return res.status(404).json({ message: "Post not found" });
-    }
-
-    const userId = req.user.userId;
     const { reaction } = req.body;
+    const userId = req.user.userId;
+    const postId = req.params.id;
 
-    post.likes = post.likes.filter(
-      (id) => id.toString() !== userId
-    );
-    post.dislikes = post.dislikes.filter(
-      (id) => id.toString() !== userId
-    );
+    const existingReaction = await Like.findOne({ postId, userId });
+    let userReaction = reaction;
 
-    if (reaction === "like") {
-      post.likes.push(userId);
+    if (existingReaction) {
+      if (existingReaction.type === reaction) {
+        await existingReaction.deleteOne();
+        userReaction = null;
+      } else {
+        existingReaction.type = reaction;
+        await existingReaction.save();
+      }
+    } else {
+      if (reaction === "like" || reaction === "dislike") {
+        await Like.create({ postId, userId, type: reaction });
+      }
     }
 
-    if (reaction === "dislike") {
-      post.dislikes.push(userId);
-    }
-
-    await post.save();
+    const stats = await getPostStats(postId, userId);
 
     res.status(200).json({
-      likesCount: post.likes.length,
-      dislikesCount: post.dislikes.length,
-      userReaction: reaction || null,
+      ...stats
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -116,35 +191,22 @@ const addComment = async (req, res) => {
   try {
     const { text } = req.body;
 
-    if (!text) {
-      return res.status(400).json({ message: "Comment text required" });
-    }
-
-    const post = await Post.findById(req.params.id).populate(
-      "comments.user",
-      "name"
-    );
-
-    if (!post) {
-      return res.status(404).json({ message: "Post not found" });
-    }
-
-    post.comments.push({
-      user: req.user.userId,
+    const comment = await Comment.create({
+      postId: req.params.id,
+      userId: req.user.userId,
       text,
     });
 
-    await post.save();
-
-    const latestComment = post.comments[post.comments.length - 1];
+    const populatedComment = await Comment.findById(comment._id).populate("userId", "name");
 
     res.status(201).json({
-      message: "Comment added",
-      comment: {
-        text: latestComment.text,
-        user: latestComment.user.name,
-        createdAt: latestComment.createdAt,
-      },
+      commentId: populatedComment._id,
+      text: populatedComment.text,
+      createdAt: populatedComment.createdAt,
+      author: {
+        id: populatedComment.userId._id,
+        name: populatedComment.userId.name
+      }
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -154,8 +216,14 @@ const addComment = async (req, res) => {
 const updatePost = async (req, res) => {
   try {
     const { title, content } = req.body;
+    let uploadImage = req.body.uploadImage;
+
+    if (req.file) {
+      uploadImage = req.file.path;
+    }
 
     const post = await Post.findById(req.params.id);
+
     if (!post) {
       return res.status(404).json({ message: "Post not found" });
     }
@@ -166,13 +234,11 @@ const updatePost = async (req, res) => {
 
     post.title = title || post.title;
     post.content = content || post.content;
+    if (uploadImage) post.uploadImage = uploadImage;
 
     await post.save();
 
-    res.status(200).json({
-      message: "Post updated successfully",
-      post,
-    });
+    res.status(200).json(post);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -181,6 +247,7 @@ const updatePost = async (req, res) => {
 const deletePost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
+
     if (!post) {
       return res.status(404).json({ message: "Post not found" });
     }
@@ -189,7 +256,10 @@ const deletePost = async (req, res) => {
       return res.status(403).json({ message: "Not authorized" });
     }
 
+    await Like.deleteMany({ postId: post._id });
+    await Comment.deleteMany({ postId: post._id });
     await post.deleteOne();
+
     res.status(200).json({ message: "Post deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -198,74 +268,18 @@ const deletePost = async (req, res) => {
 
 const deleteComment = async (req, res) => {
   try {
-    const { id: postId, commentId } = req.params;
+    const comment = await Comment.findById(req.params.commentId);
 
-    const post = await Post.findById(postId);
-    if (!post) {
-      return res.status(404).json({ message: "Post not found" });
-    }
-
-    const comment = post.comments.id(commentId);
     if (!comment) {
       return res.status(404).json({ message: "Comment not found" });
     }
 
-    if (
-      comment.user.toString() !== req.user.userId &&
-      post.author.toString() !== req.user.userId
-    ) {
+    if (comment.userId.toString() !== req.user.userId) {
       return res.status(403).json({ message: "Not authorized" });
     }
 
-    comment.deleteOne();
-    await post.save();
-
+    await comment.deleteOne();
     res.status(200).json({ message: "Comment deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-const getPostById = async (req, res) => {
-  try {
-    const post = await Post.findById(req.params.id)
-      .populate("author", "name username email")
-      .populate("likes", "name username")
-      .populate("dislikes", "name username")
-      .populate("comments.user", "name username email");
-
-    if (!post) {
-      return res.status(404).json({ message: "Post not found" });
-    }
-
-    res.status(200).json({
-      _id: post._id,
-      title: post.title,
-      content: post.content,
-      author: post.author.name,
-      authorUsername: post.author.username,
-      email: post.author.email,
-      likes: post.likes.map((u) => ({
-        _id: u._id,
-        name: u.name,
-        username: u.username,
-      })),
-      dislikes: post.dislikes.map((u) => ({
-        _id: u._id,
-        name: u.name,
-        username: u.username,
-      })),
-      comments: post.comments.map((c) => ({
-        _id: c._id,
-        text: c.text,
-        user: c.user?.name,
-        username: c.user?.username,
-        email: c.user?.email,
-        createdAt: c.createdAt,
-      })),
-      createdAt: post.createdAt,
-      updatedAt: post.updatedAt,
-    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

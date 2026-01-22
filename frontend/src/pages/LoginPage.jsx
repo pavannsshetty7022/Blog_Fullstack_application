@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { login as loginApi } from "../services/api";
-import usePageTitle from "../hooks/usePageTitle";
+import usePageTitle from "../hooks/usePageTitle.jsx";
 
 const LoginPage = () => {
   usePageTitle("Login");

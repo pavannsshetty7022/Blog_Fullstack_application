@@ -12,7 +12,7 @@ const PostDetailsPage = () => {
     const navigate = useNavigate();
     const [post, setPost] = useState(null);
 
-    usePageTitle(post?.title || "Post Details");
+    usePageTitle("Post Details");
 
     const [loading, setLoading] = useState(true);
     const [commentText, setCommentText] = useState("");
@@ -38,21 +38,17 @@ const PostDetailsPage = () => {
         loadPost();
     }, [id]);
 
-    const getInitialReaction = () => {
-        if (post?.likes?.some(l => l.username === user?.username)) return "like";
-        if (post?.dislikes?.some(l => l.username === user?.username)) return "dislike";
-        return null;
-    };
-
     const [reaction, setReaction] = useState(null);
     const [likesCount, setLikesCount] = useState(0);
     const [dislikesCount, setDislikesCount] = useState(0);
+    const [commentsCount, setCommentsCount] = useState(0);
 
     useEffect(() => {
         if (post) {
-            setLikesCount(post.likes?.length || 0);
-            setDislikesCount(post.dislikes?.length || 0);
-            setReaction(getInitialReaction());
+            setLikesCount(post.totalLikeCount || 0);
+            setDislikesCount(post.dislikeCount || 0);
+            setCommentsCount(post.commentsCount || post.comments?.length || 0);
+            setReaction(post.userReaction || null);
         }
     }, [post]);
 
@@ -76,8 +72,17 @@ const PostDetailsPage = () => {
 
         try {
             const { data } = await reactPost(id, newReaction);
-            setLikesCount(data.likesCount);
-            setDislikesCount(data.dislikesCount);
+            setPost(prev => ({
+                ...prev,
+                totalLikeCount: data.totalLikeCount,
+                dislikeCount: data.dislikeCount,
+                userReaction: data.userReaction,
+                likedByCurrentUser: data.likedByCurrentUser,
+                otherLikeCount: data.otherLikeCount,
+                likedUsers: data.likedUsers
+            }));
+            setLikesCount(data.totalLikeCount);
+            setDislikesCount(data.dislikeCount);
             setReaction(data.userReaction);
         } catch (err) {
             console.error(err);
@@ -254,14 +259,16 @@ const PostDetailsPage = () => {
                                 </button>
                                 <button className="btn btn-link link-dark text-decoration-none p-0 d-flex align-items-center" onClick={() => document.getElementById('comments').scrollIntoView({ behavior: 'smooth' })}>
                                     <i className="bi bi-chat me-2 fs-4"></i>
-                                    <span className="fw-bold">{post.comments.length}</span>
+                                    <span className="fw-bold">{commentsCount}</span>
                                 </button>
                             </div>
 
                             {likesCount > 0 && (
                                 <LikesDropdown
-                                    likes={post.likes}
-                                    reaction={reaction}
+                                    totalLikeCount={post.totalLikeCount}
+                                    likedByCurrentUser={post.likedByCurrentUser}
+                                    otherLikeCount={post.otherLikeCount}
+                                    likedUsers={post.likedUsers}
                                     currentUser={user}
                                 />
                             )}
@@ -270,7 +277,7 @@ const PostDetailsPage = () => {
 
                     <section id="comments">
                         <div className="d-flex justify-content-between align-items-center mb-4">
-                            <h4 className="mb-0 fw-bold">Conversation ({post.comments.length})</h4>
+                            <h4 className="mb-0 fw-bold">Conversation ({commentsCount})</h4>
                         </div>
 
                         <form onSubmit={handleCommentSubmit} className="mb-5 bg-white p-4 rounded shadow-sm border">
@@ -302,16 +309,16 @@ const PostDetailsPage = () => {
 
                         <div className="comment-list">
                             {[...post.comments].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((comment) => (
-                                <div key={comment._id} className="d-flex mb-4 group">
+                                <div key={comment.commentId} className="d-flex mb-4 group">
                                     <div className="bg-light rounded-circle d-flex align-items-center justify-content-center me-3" style={{ width: "40px", height: "40px", flexShrink: 0 }}>
-                                        <span className="text-secondary small fw-bold">{(comment.username || "U").charAt(0).toUpperCase()}</span>
+                                        <span className="text-secondary small fw-bold">{(comment.author?.name || "U").charAt(0).toUpperCase()}</span>
                                     </div>
                                     <div className="flex-grow-1">
                                         <div className="bg-light p-3 rounded-4 position-relative">
                                             <div className="d-flex justify-content-between align-items-center mb-1">
-                                                <span className="fw-bold small">@{comment.username}</span>
-                                                {(user?.username === comment.username || isAuthor) && (
-                                                    <button className="btn btn-link link-danger p-0 ms-2" onClick={() => handleDeleteComment(comment._id)}>
+                                                <span className="fw-bold small">{comment.author?.name}</span>
+                                                {(user?.userId === comment.author?.id || isAuthor) && (
+                                                    <button className="btn btn-link link-danger p-0 ms-2" onClick={() => handleDeleteComment(comment.commentId)}>
                                                         <i className="bi bi-trash-fill small"></i>
                                                     </button>
                                                 )}

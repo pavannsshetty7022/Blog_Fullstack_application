@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { fetchPostById, updatePost } from "../services/api";
 import BackButton from "../components/BackButton";
-import usePageTitle from "../hooks/usePageTitle";
+import usePageTitle from "../hooks/usePageTitle.jsx";
 
 const UpdatePostPage = () => {
     usePageTitle("Update Post");
     const { id } = useParams();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({ title: "", content: "" });
+    const [image, setImage] = useState(null);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState("");
@@ -31,11 +32,22 @@ const UpdatePostPage = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const handleImageChange = (e) => {
+        setImage(e.target.files[0]);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSubmitting(true);
         try {
-            await updatePost(id, formData);
+            const data = new FormData();
+            data.append("title", formData.title);
+            data.append("content", formData.content);
+            if (image) {
+                data.append("image", image);
+            }
+
+            await updatePost(id, data);
             navigate(`/post/${id}`);
         } catch (err) {
             setError(err.response?.data?.message || "Failed to update post.");
@@ -84,6 +96,15 @@ const UpdatePostPage = () => {
                                     onChange={handleChange}
                                     required
                                 ></textarea>
+                            </div>
+                            <div className="mb-4">
+                                <label className="form-label fw-semibold">Update Image</label>
+                                <input
+                                    type="file"
+                                    className="form-control"
+                                    onChange={handleImageChange}
+                                    accept="image/*"
+                                />
                             </div>
                             <div className="d-flex gap-3">
                                 <button

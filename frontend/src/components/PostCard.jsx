@@ -1,20 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { reactPost } from "../services/api";
+import LikesDropdown from "./LikesDropdown";
 
 const PostCard = ({ post }) => {
     const { user } = useAuth();
 
-    const getInitialReaction = () => {
-        if (post.likes?.some(l => l.username === user?.username)) return "like";
-        if (post.dislikes?.some(l => l.username === user?.username)) return "dislike";
-        return null;
-    };
+    const [reaction, setReaction] = useState(post.userReaction || null);
+    const [likesCount, setLikesCount] = useState(post.totalLikeCount || 0);
+    const [dislikesCount, setDislikesCount] = useState(post.dislikeCount || 0);
 
-    const [reaction, setReaction] = useState(getInitialReaction());
-    const [likesCount, setLikesCount] = useState(post.likes?.length || 0);
-    const [dislikesCount, setDislikesCount] = useState(post.dislikes?.length || 0);
+    const [stats, setStats] = useState({
+        totalLikeCount: post.totalLikeCount || 0,
+        likedByCurrentUser: post.likedByCurrentUser || false,
+        otherLikeCount: post.otherLikeCount || 0,
+        likedUsers: post.likedUsers || []
+    });
+
+    useEffect(() => {
+        setReaction(post.userReaction || null);
+        setLikesCount(post.totalLikeCount || 0);
+        setDislikesCount(post.dislikeCount || 0);
+        setStats({
+            totalLikeCount: post.totalLikeCount || 0,
+            likedByCurrentUser: post.likedByCurrentUser || false,
+            otherLikeCount: post.otherLikeCount || 0,
+            likedUsers: post.likedUsers || []
+        });
+    }, [post]);
 
     const handleReact = async (type) => {
         if (!user) return;
@@ -36,16 +50,37 @@ const PostCard = ({ post }) => {
         setLikesCount(newLikes);
         setDislikesCount(newDislikes);
 
+        const newIsLiked = newReaction === 'like';
+        setStats(prev => ({
+            ...prev,
+            totalLikeCount: newLikes,
+            likedByCurrentUser: newIsLiked,
+            otherLikeCount: Math.max(0, newLikes - (newIsLiked ? 1 : 0))
+        }));
+
         try {
             const { data } = await reactPost(post._id, newReaction);
-            setLikesCount(data.likesCount);
-            setDislikesCount(data.dislikesCount);
+            setLikesCount(data.totalLikeCount);
+            setDislikesCount(data.dislikeCount);
             setReaction(data.userReaction);
+            setStats({
+                totalLikeCount: data.totalLikeCount,
+                likedByCurrentUser: data.likedByCurrentUser,
+                otherLikeCount: data.otherLikeCount,
+                likedUsers: data.likedUsers
+            });
         } catch (err) {
             console.error("Reaction failed", err);
             setReaction(oldReaction);
             setLikesCount(likesCount);
             setDislikesCount(dislikesCount);
+            const oldIsLiked = oldReaction === 'like';
+            setStats(prev => ({
+                ...prev,
+                totalLikeCount: likesCount,
+                likedByCurrentUser: oldIsLiked,
+                otherLikeCount: Math.max(0, likesCount - (oldIsLiked ? 1 : 0))
+            }));
         }
     };
 
@@ -111,6 +146,17 @@ const PostCard = ({ post }) => {
                         Read More
                     </Link>
                 </div>
+                {likesCount > 0 && (
+                    <div className="mt-3 pt-2 border-top border-light">
+                        <LikesDropdown
+                            totalLikeCount={stats.totalLikeCount}
+                            likedByCurrentUser={stats.likedByCurrentUser}
+                            otherLikeCount={stats.otherLikeCount}
+                            likedUsers={stats.likedUsers}
+                            currentUser={user}
+                        />
+                    </div>
+                )}
             </div>
         </div>
     );
