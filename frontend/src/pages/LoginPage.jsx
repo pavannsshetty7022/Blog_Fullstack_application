@@ -52,7 +52,7 @@ const LoginPage = () => {
         <div className="col-md-4">
           <div className="card p-4 shadow-sm border-0">
             <h2 className="text-center mb-4 fw-bold">
-              <i className="bi bi-box-arrow-in-right me-2"></i>Login
+              <i className="bi bi-box-arrow-in-right me-2"></i>Sign In
             </h2>
 
             {error && (
@@ -114,14 +114,14 @@ const LoginPage = () => {
                 {loading && (
                   <span className="spinner-border spinner-border-sm me-2"></span>
                 )}
-                Login
+                Sign In
               </button>
             </form>
 
             <p className="text-center mb-0 mt-3">
               Don&apos;t have an account?
               <Link to="/register" className="ms-1 text-decoration-none">
-                Register here
+                Sign Up
               </Link>
             </p>
           </div>

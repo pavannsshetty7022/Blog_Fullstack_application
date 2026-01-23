@@ -89,7 +89,7 @@ const MyPostsPage = () => {
                                                 />
                                             </div>
                                         )}
-                                        <p className="text-secondary " style={{
+                                        <p className="text-secondary" style={{
                                             // display: "-webkit-box",
                                             // WebkitLineClamp: 2,
                                             // WebkitBoxOrient: "vertical",
