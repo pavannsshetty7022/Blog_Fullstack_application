@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="BlogApp Logo.png" width="120" alt="Blog App Icon"/>
+  <img src="frontend\public\BlogApp Logo.png" width="120" alt="Blog App Icon"/>
 </p>
 
 <h1 align="center">🚀 Blog Application – Full Stack MERN Project</h1>
