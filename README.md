@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://cdn-icons-png.flaticon.com/512/3959/3959542.png" width="120" alt="Blog App Icon"/>
+  <img src="BlogApp Logo.png" width="120" alt="Blog App Icon"/>
 </p>
 
 <h1 align="center">🚀 Blog Application – Full Stack MERN Project</h1>
@@ -92,5 +92,5 @@ The **Blog Application** is a full-stack web platform that enables users to crea
 
 ---
 
-## 🧱 Project Structure
+
 
