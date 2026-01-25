@@ -82,7 +82,7 @@ const MyPostsPage = () => {
                                         {post.uploadImage && (
                                             <div className="mb-3">
                                                 <img 
-                                                    src={`https://blog-fullstack-application.onrender.com/${post.uploadImage}`} 
+                                                    src={post.uploadImage} 
                                                     alt={post.title}
                                                     className="img-fluid rounded"
                                                     style={{ maxWidth: "100%", height: "250px", width:"350px", objectFit: "cover", borderRadius: "2px", boxShadow: "0 2px 6px rgba(0,0,0,0.1)" }}
