@@ -99,6 +99,7 @@ const Navbar = () => {
                 type="button"
                 id="userNavbarDropdown"
                 data-bs-toggle="dropdown"
+                data-bs-display="static"
               >
                 <div
                   className="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-2"
@@ -127,8 +128,7 @@ const Navbar = () => {
                     to="/profile"
                     onClick={handleLinkClick}
                     className={({ isActive }) =>
-                      `dropdown-item py-2 px-3 rounded ${
-                        isActive ? "fw-bold text-dark bg-light" : ""
+                      `dropdown-item py-2 px-3 rounded ${isActive ? "fw-bold text-dark bg-light" : ""
                       }`
                     }
                   >

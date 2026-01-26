@@ -157,8 +157,7 @@ h6 {
 }
 
 .dropdown-menu {
-  z-index: 1070 !important;
-  position: absolute !important;
+  z-index: 1070;
 }
 
 .dropdown-item {
