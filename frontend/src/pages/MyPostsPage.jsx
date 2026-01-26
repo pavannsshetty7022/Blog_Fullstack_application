@@ -52,12 +52,12 @@ const MyPostsPage = () => {
     return (
         <div className="container py-4 py-md-5 relative z-10" style={{ position: "relative", zIndex: 10 }}>
             <BackButton />
-            <div className="d-flex justify-content-between align-items-center mb-5">
+            <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center align-items-start gap-3 mb-5">
                 <div>
                     <h1 className="fw-bold mb-1">My Posts</h1>
-                    <p className="text-secondary">Manage and track your published articles.</p>
+                    <p className="text-secondary mb-0">Manage and track your published articles.</p>
                 </div>
-                <Link to="/create" className="btn btn-primary rounded-pill px-4">
+                <Link to="/create" className="btn btn-primary border-1 rounded-pill px-4">
                     <i className="bi bi-plus-lg me-2"></i> New Post
                 </Link>
             </div>
@@ -81,11 +81,11 @@ const MyPostsPage = () => {
                                         </h4>
                                         {post.uploadImage && (
                                             <div className="mb-3">
-                                                <img 
-                                                    src={post.uploadImage} 
+                                                <img
+                                                    src={post.uploadImage}
                                                     alt={post.title}
                                                     className="img-fluid rounded"
-                                                    style={{ maxWidth: "100%", height: "250px", width:"350px", objectFit: "cover", borderRadius: "2px", boxShadow: "0 2px 6px rgba(0,0,0,0.1)" }}
+                                                    style={{ maxWidth: "100%", height: "250px", width: "350px", objectFit: "cover", borderRadius: "2px", boxShadow: "0 2px 6px rgba(0,0,0,0.1)" }}
                                                 />
                                             </div>
                                         )}
@@ -97,7 +97,7 @@ const MyPostsPage = () => {
                                         }}>
                                             {post.content}
                                         </p>
-                                        
+
                                         <div className="d-flex gap-3 text-muted small">
                                             <span><i className="bi bi-calendar3 me-1"></i> {new Date(post.createdAt).toLocaleDateString()}</span>
                                             <span><i className="bi bi-hand-thumbs-up me-1"></i> {post.totalLikeCount || 0} Likes</span>

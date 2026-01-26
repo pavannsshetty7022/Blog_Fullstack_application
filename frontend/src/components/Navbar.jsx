@@ -102,12 +102,20 @@ const Navbar = () => {
                 data-bs-display="static"
               >
                 <div
-                  className="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-2"
+                  className="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-2 overflow-hidden border border-primary border-opacity-10"
                   style={{ width: "38px", height: "38px" }}
                 >
-                  <span className="small fw-bold text-primary">
-                    {getInitials(user.name)}
-                  </span>
+                  {user.profileImage ? (
+                    <img
+                      src={user.profileImage}
+                      alt={user.name}
+                      className="w-100 h-100 object-fit-cover"
+                    />
+                  ) : (
+                    <span className="small fw-bold text-primary">
+                      {getInitials(user.name)}
+                    </span>
+                  )}
                 </div>
                 <span className="d-none d-md-inline fw-medium text-dark">
                   {user.name}

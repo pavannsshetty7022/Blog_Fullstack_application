@@ -29,7 +29,7 @@ const PostDetailsPage = () => {
     try {
       const { data } = await fetchPostById(id);
       const elapsedTime = Date.now() - startTime;
-      const remainingTime = Math.max(0, 2000 - elapsedTime);
+      const remainingTime = Math.max(0, 1000 - elapsedTime);
 
       await new Promise((resolve) => setTimeout(resolve, remainingTime));
       setPost(data);
@@ -282,7 +282,7 @@ const PostDetailsPage = () => {
               <h1 className="display-5 display-md-4 fw-bold mb-3">
                 {post.title}
               </h1>
-              <div className="d-flex align-items-center justify-content-between">
+              <div className="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
                 <div className="d-flex align-items-center">
                   <div className="bg-light rounded-circle p-2 me-3">
                     <i className="bi bi-person fs-4 text-primary"></i>
@@ -302,13 +302,13 @@ const PostDetailsPage = () => {
                 {isAuthor && (
                   <div className="d-flex gap-2">
                     <button
-                      className="btn btn-outline-secondary btn-sm rounded-pill px-3"
+                      className="btn btn-outline-secondary btn-sm rounded-pill px-3 border-1"
                       onClick={() => navigate(`/edit/${post._id}`)}
                     >
                       <i className="bi bi-pencil-square me-1"></i> Edit
                     </button>
                     <button
-                      className="btn btn-outline-danger btn-sm rounded-pill px-3"
+                      className="btn btn-outline-danger btn-sm rounded-pill px-3 border-1"
                       onClick={handleDeletePost}
                     >
                       <i className="bi bi-trash me-1"></i> Delete
@@ -321,7 +321,7 @@ const PostDetailsPage = () => {
             {post.uploadImage && (
               <div className="mb-5 d-flex justify-content-center">
                 <img
-                  src={post.uploadImage} 
+                  src={post.uploadImage}
                   alt={post.title}
                   className="img-fluid rounded"
                   style={{
@@ -464,15 +464,15 @@ const PostDetailsPage = () => {
                           </span>
                           {(user?.userId === comment.author?.id ||
                             isAuthor) && (
-                            <button
-                              className="btn btn-link link-danger p-0 ms-2"
-                              onClick={() =>
-                                handleDeleteComment(comment.commentId)
-                              }
-                            >
-                              <i className="bi bi-trash-fill small"></i>
-                            </button>
-                          )}
+                              <button
+                                className="btn btn-link link-danger p-0 ms-2"
+                                onClick={() =>
+                                  handleDeleteComment(comment.commentId)
+                                }
+                              >
+                                <i className="bi bi-trash-fill small"></i>
+                              </button>
+                            )}
                         </div>
                         <p className="mb-0 text-secondary small">
                           {comment.text}

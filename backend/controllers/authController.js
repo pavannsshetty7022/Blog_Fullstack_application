@@ -33,6 +33,7 @@ const register = async (req, res) => {
         name: user.name,
         username: user.username,
         email: user.email,
+        profileImage: user.profileImage,
       },
       process.env.JWT_SECRET,
       { expiresIn: "3d" }
@@ -46,6 +47,7 @@ const register = async (req, res) => {
         name: user.name,
         username: user.username,
         email: user.email,
+        profileImage: user.profileImage,
       },
     });
   } catch (error) {
@@ -86,6 +88,7 @@ const login = async (req, res) => {
         name: user.name,
         username: user.username,
         email: user.email,
+        profileImage: user.profileImage,
       },
       process.env.JWT_SECRET,
       { expiresIn: "3d" }
@@ -99,6 +102,7 @@ const login = async (req, res) => {
         name: user.name,
         username: user.username,
         email: user.email,
+        profileImage: user.profileImage,
       },
     });
   } catch (error) {
@@ -108,7 +112,7 @@ const login = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
-    const { name, username, email, password } = req.body;
+    const { name, username, email, password, removeImage } = req.body;
     const userId = req.user.userId;
 
     const user = await User.findById(userId);
@@ -133,9 +137,12 @@ const updateProfile = async (req, res) => {
     }
 
     if (name) user.name = name;
+    if (password) user.password = password;
 
-    if (password) {
-      user.password = password;
+    if (req.file) {
+      user.profileImage = req.file.path;
+    } else if (removeImage === "true") {
+      user.profileImage = "";
     }
 
     await user.save();
@@ -146,6 +153,7 @@ const updateProfile = async (req, res) => {
         name: user.name,
         username: user.username,
         email: user.email,
+        profileImage: user.profileImage,
       },
       process.env.JWT_SECRET,
       { expiresIn: "3d" }
@@ -159,6 +167,7 @@ const updateProfile = async (req, res) => {
         name: user.name,
         username: user.username,
         email: user.email,
+        profileImage: user.profileImage,
       },
     });
   } catch (error) {

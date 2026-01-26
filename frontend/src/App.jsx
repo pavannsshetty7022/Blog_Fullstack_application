@@ -12,12 +12,14 @@ import MyPostsPage from "./pages/MyPostsPage";
 import ProfilePage from "./pages/ProfilePage";
 import UpdatePostPage from "./pages/UpdatePostPage";
 import BackgroundLayout from "./components/BackgroundLayout";
+import ScrollToTop from "./components/ScrollToTop";
 
 import "./App.css";
 
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <AuthProvider>
         <Navbar />
         <main>

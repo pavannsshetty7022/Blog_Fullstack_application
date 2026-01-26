@@ -17,6 +17,10 @@ const ProfilePage = () => {
     password: "",
   });
 
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(user?.profileImage || "");
+  const [removeImage, setRemoveImage] = useState(false);
+
   const [originalData, setOriginalData] = useState({
     name: user?.name || "",
     username: user?.username || "",
@@ -37,8 +41,26 @@ const ProfilePage = () => {
       };
       setFormData(data);
       setOriginalData(data);
+      setImagePreview(user.profileImage || "");
+      setRemoveImage(false);
+      setImageFile(null);
     }
   }, [user]);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+      setRemoveImage(false);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview("");
+    setRemoveImage(true);
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -51,6 +73,9 @@ const ProfilePage = () => {
 
   const handleCancelClick = () => {
     setFormData(originalData);
+    setImagePreview(user?.profileImage || "");
+    setImageFile(null);
+    setRemoveImage(false);
     setIsEditMode(false);
     setMessage({ type: "", text: "" });
   };
@@ -71,7 +96,15 @@ const ProfilePage = () => {
     setMessage({ type: "", text: "" });
 
     try {
-      const { data } = await updateProfile(formData);
+      const dataToSend = new FormData();
+      dataToSend.append("name", formData.name);
+      dataToSend.append("username", formData.username);
+      dataToSend.append("email", formData.email);
+      if (formData.password) dataToSend.append("password", formData.password);
+      if (imageFile) dataToSend.append("image", imageFile);
+      if (removeImage) dataToSend.append("removeImage", "true");
+
+      const { data } = await updateProfile(dataToSend);
       setMessage({ type: "success", text: "Profile updated successfully!" });
 
       if (data.token) {
@@ -80,6 +113,8 @@ const ProfilePage = () => {
 
       setOriginalData({ ...formData, password: "" });
       setFormData((prev) => ({ ...prev, password: "" }));
+      setImageFile(null);
+      setRemoveImage(false);
       setIsEditMode(false);
     } catch (err) {
       setMessage({
@@ -99,13 +134,54 @@ const ProfilePage = () => {
 
           <div className="card p-4 shadow-sm border-0">
             <div className="text-center mb-4">
-              <div
-                className="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
-                style={{ width: "90px", height: "90px" }}
-              >
-                <span className="fs-1 fw-bold text-primary">
-                  {getInitials(user?.name)}
-                </span>
+              <div className="position-relative d-inline-block mb-3">
+                <div
+                  className="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center overflow-hidden border border-primary border-opacity-10"
+                  style={{ width: "100px", height: "100px" }}
+                >
+                  {imagePreview ? (
+                    <img
+                      src={imagePreview}
+                      alt="Profile"
+                      className="w-100 h-100 object-fit-cover"
+                    />
+                  ) : (
+                    <span className="fs-1 fw-bold text-primary">
+                      {getInitials(user?.name)}
+                    </span>
+                  )}
+                </div>
+
+                {isEditMode && (
+                  <div className="position-absolute bottom-0 end-0 d-flex gap-1">
+                    <label
+                      htmlFor="profileImageInput"
+                      className="btn btn-primary btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center shadow-sm"
+                      style={{ width: "32px", height: "32px", cursor: "pointer" }}
+                      title="Upload Photo"
+                    >
+                      <i className="bi bi-camera-fill small"></i>
+                      <input
+                        type="file"
+                        id="profileImageInput"
+                        className="d-none"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                      />
+                    </label>
+                    {imagePreview && (
+                      <button
+                        type="button"
+                        className="btn btn-danger btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center shadow-sm"
+                        style={{ width: "32px", height: "32px" }}
+                        onClick={handleRemoveImage}
+                        title="Remove Photo"
+                      >
+                        <i className="bi bi-trash-fill small"></i>
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
 
               <h2 className="fw-bold mb-1">{user?.name}</h2>

@@ -15,7 +15,7 @@ const HomePage = () => {
         try {
             const { data } = await fetchPosts();
             const elapsedTime = Date.now() - startTime;
-            const remainingTime = Math.max(0, 2000 - elapsedTime);
+            const remainingTime = Math.max(0, 1000 - elapsedTime);
 
             await new Promise(resolve => setTimeout(resolve, remainingTime));
             setPosts(data);
