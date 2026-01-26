@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const checkAuth = () => {
-            const token = localStorage.getItem("token");
+            const token = sessionStorage.getItem("token");
             if (!token) {
                 setLoading(false);
                 return;
@@ -36,20 +36,20 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const loginUser = (token) => {
-        localStorage.setItem("token", token);
+        sessionStorage.setItem("token", token);
         const decoded = jwtDecode(token);
         setUser(decoded);
         navigate("/");
     };
 
     const updateAuth = (token) => {
-        localStorage.setItem("token", token);
+        sessionStorage.setItem("token", token);
         const decoded = jwtDecode(token);
         setUser(decoded);
     };
 
     const logout = async () => {
-        localStorage.removeItem("token");
+        sessionStorage.removeItem("token");
         setUser(null);
         try {
             await logoutApi();

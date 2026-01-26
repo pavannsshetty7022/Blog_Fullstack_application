@@ -62,7 +62,7 @@ const LoginPage = () => {
               </div>
             )}
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} autoComplete="off">
               <div className="mb-3">
                 <label className="form-label">Email or Username</label>
                 <div className="input-group">
@@ -75,6 +75,7 @@ const LoginPage = () => {
                     className="form-control"
                     placeholder="Enter email or username"
                     required
+                    autoComplete="username"
                     onChange={handleChange}
                   />
                 </div>
@@ -92,6 +93,7 @@ const LoginPage = () => {
                     className="form-control"
                     placeholder="Enter password"
                     required
+                    autoComplete="new-password"
                     onChange={handleChange}
                   />
                   <button

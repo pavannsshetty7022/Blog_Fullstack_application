@@ -62,7 +62,7 @@ const RegisterPage = () => {
               </div>
             )}
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} autoComplete="off">
               <div className="mb-3">
                 <label className="form-label">Full Name</label>
                 <input
@@ -71,6 +71,7 @@ const RegisterPage = () => {
                   className="form-control"
                   placeholder="John Doe"
                   required
+                  autoComplete="name"
                   onChange={handleChange}
                 />
               </div>
@@ -83,6 +84,7 @@ const RegisterPage = () => {
                   className="form-control"
                   placeholder="name@example.com"
                   required
+                  autoComplete="email"
                   onChange={handleChange}
                 />
               </div>
@@ -95,6 +97,7 @@ const RegisterPage = () => {
                   className="form-control"
                   placeholder="johndoe123"
                   required
+                  autoComplete="username"
                   onChange={handleChange}
                 />
               </div>
@@ -108,6 +111,7 @@ const RegisterPage = () => {
                     className="form-control"
                     placeholder="Choose a password"
                     required
+                    autoComplete="new-password"
                     onChange={handleChange}
                   />
                   <button
