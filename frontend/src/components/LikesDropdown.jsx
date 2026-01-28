@@ -9,13 +9,9 @@ const LikesDropdown = ({
 }) => {
     if (totalLikeCount === 0) return null;
 
-    const otherUsers = likedUsers.filter(
-        (liker) => liker.userId !== currentUser?.userId
-    );
-
     const renderLikesLink = (label, usersToShow, totalCount) => {
         return (
-            <span className="dropdown position-relative">
+            <span className="dropdown d-inline">
                 <span
                     className="text-decoration-underline dropdown-toggle fw-bold"
                     role="button"
@@ -29,8 +25,8 @@ const LikesDropdown = ({
                 <ul
                     className="dropdown-menu border-0 shadow-lg p-2"
                     style={{
-                        maxHeight: "200px",
-                        minWidth: "180px",
+                        maxHeight: "250px",
+                        minWidth: "200px",
                         overflowY: "auto",
                         zIndex: 1070,
                     }}
@@ -53,7 +49,9 @@ const LikesDropdown = ({
                                 >
                                     {liker.name?.charAt(0).toUpperCase() || "U"}
                                 </div>
-                                <span className="fw-medium">{liker.name}</span>
+                                <span className="fw-medium text-truncate">
+                                    {liker.userId === currentUser?.userId ? "You" : liker.name}
+                                </span>
                             </span>
                         </li>
                     ))}
@@ -75,28 +73,29 @@ const LikesDropdown = ({
         );
     };
 
+    let label = "";
+    if (likedByCurrentUser) {
+        if (totalLikeCount === 1) {
+            label = "You";
+        } else {
+            label = `You and ${otherLikeCount} ${otherLikeCount === 1 ? "other" : "others"}`;
+        }
+    } else {
+        if (totalLikeCount === 1) {
+            label = likedUsers[0]?.name || "1 user";
+        } else {
+            label = `${totalLikeCount} users`;
+        }
+    }
+
     return (
         <div className="small text-muted d-flex align-items-center gap-1 py-1">
             <i
                 className="bi bi-heart-fill text-danger opacity-75"
                 style={{ fontSize: "0.8rem" }}
             ></i>
-
             <span style={{ fontSize: "0.85rem" }}>
-                {likedByCurrentUser ? (
-                    <>
-                        Liked by <strong>You</strong>
-                        {otherLikeCount > 0 && <> and {renderLikesLink(`${otherLikeCount} ${otherLikeCount === 1 ? 'other' : 'others'}`, otherUsers, totalLikeCount)}</>}
-                    </>
-                ) : (
-                    <>
-                        Liked by {totalLikeCount === 1 ? (
-                            renderLikesLink(otherUsers[0]?.name || "1 user", otherUsers, totalLikeCount)
-                        ) : (
-                            renderLikesLink(`${totalLikeCount} users`, otherUsers, totalLikeCount)
-                        )}
-                    </>
-                )}
+                Liked by {renderLikesLink(label, likedUsers, totalLikeCount)}
             </span>
         </div>
     );
