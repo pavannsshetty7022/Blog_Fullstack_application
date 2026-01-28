@@ -295,7 +295,7 @@ const PostDetailsPage = () => {
                         day: "numeric",
                         year: "numeric",
                       })}{" "}
-                      · 5 min read
+                     
                     </small>
                   </div>
                 </div>
@@ -432,7 +432,7 @@ const PostDetailsPage = () => {
               <div className="d-flex justify-content-end">
                 <button
                   type="submit"
-                  className="btn btn-primary rounded-pill px-4 fw-semibold"
+                  className="btn btn-primary  px-4 fw-semibold"
                   disabled={submittingComment}
                 >
                   {submittingComment ? (

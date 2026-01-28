@@ -183,7 +183,7 @@ const PostCard = ({ post }) => {
           </div>
           <Link
             to={`/post/${post._id}`}
-            className="btn btn-sm btn-outline-primary rounded-pill px-3"
+            className="btn btn-sm btn-outline-primary px-3"
           >
             Read More
           </Link>
